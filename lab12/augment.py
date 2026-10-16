@@ -50,4 +50,10 @@ def dagger_windows(planner, logs, idx, expert=None):
     #   (hist_rel, v, gap, lead_v) của các hàng còn đang lái: np.concatenate theo từng thành phần. (3) X =
     #   features('perc', hist_rel, v, gap, lead_v). (4) Y = idm_forecast(expert, v, gap, lead_v): nhãn là
     #   việc luật IDM sẽ làm Ở CHÍNH các trạng thái đó. Trả (X, Y).
-    raise NotImplementedError("TODO dagger_windows: xem GUIDE.md, Bước 7")
+    from . import sim
+    from .planners import idm_forecast
+
+    rec = []
+    sim.rollout_logs(planner, logs, idx, record=rec)
+    hist_rel, v, gap, lead_v = (np.concatenate(values) for values in zip(*rec))
+    return features("perc", hist_rel, v, gap, lead_v), idm_forecast(expert or IDM(), v, gap, lead_v)
